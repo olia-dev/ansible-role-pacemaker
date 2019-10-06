@@ -1,4 +1,12 @@
 ---
+- name: Install required packages
+  package:
+          name:
+                  - pcs
+                  - pacemaker
+                  - corosync
+          state: present
+
 - name: Enable and start PCS daemon
   service:
     name: pcsd
