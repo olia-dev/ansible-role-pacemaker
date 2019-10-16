@@ -23,7 +23,7 @@
   user:
     name: "{{ pcmk_user }}"
     system: true
-    password: "{{ pcmk_password | password_hash('sha512', ansible_hostname) }}"
+    password: "{{ pcmk_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string)  }}"
 
 - name: Authenticate all nodes
   command: >
