@@ -36,7 +36,7 @@
   args:
     creates: /var/lib/pcsd/tokens
     
- - name: Authenticate all nodes (CentOS/RedHat 8)
+- name: Authenticate all nodes (CentOS/RedHat 8)
   command: >
     pcs host auth
     {{ ansible_play_batch | join(' ') }}
