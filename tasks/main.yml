@@ -32,7 +32,7 @@
     -u {{ pcmk_user }}
     -p {{ pcmk_password | quote }}
   run_once: true
-  when: ansible_distribution_major_version < 8
+  when: ansible_distribution_major_version|int < 8
   args:
     creates: /var/lib/pcsd/tokens
     
@@ -43,12 +43,30 @@
     -u {{ pcmk_user }}
     -p {{ pcmk_password | quote }}
   run_once: true
-  when: ansible_distribution_major_version > 7
+  when: ansible_distribution_major_version|int > 7
   args:
     creates: /var/lib/pcsd/tokens
 
 - name: Setup message bus
   run_once: true
+  when: ansible_distribution_major_version|int < 8
+  command: >
+    pcs cluster setup --name {{ pcmk_cluster_name | quote }}
+    {{  ansible_play_batch | join(' ') }}
+    {%  for key, value in pcmk_votequorum.items() %}
+    {%    if value is sameas(true) %}
+    {%      set value = 1 %}
+    {%    elif value is sameas(false) %}
+    {%      set value = 0 %}
+    {%    endif %}
+    {{    '--%s=%s' | format(key, value) }}
+    {%  endfor %}
+  args:
+    creates: /etc/corosync/corosync.conf
+   
+- name: Setup message bus (RedHat/CentOS 8)
+  run_once: true
+  when: ansible_distribution_major_version|int > 7
   command: >
     pcs cluster setup --name {{ pcmk_cluster_name | quote }}
     {{  ansible_play_batch | join(' ') }}
